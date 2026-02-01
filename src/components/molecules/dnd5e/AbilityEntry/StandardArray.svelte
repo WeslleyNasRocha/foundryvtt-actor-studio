@@ -7,8 +7,12 @@
     isStandardArrayValues,
     abilityRolls,
   } from "~/src/stores/index";
-  import { MODULE_ID, STANDARD_ARRAY } from "~/src/helpers/constants";
-  import { dnd5eModCalc, localize as t } from "~/src/helpers/Utility";
+  import { MODULE_ID } from "~/src/helpers/constants";
+  import {
+    dnd5eModCalc,
+    localize as t,
+    safeGetSetting,
+  } from "~/src/helpers/Utility";
 
   const doc = getContext("#doc");
   const updateDebounce = Timing.debounce(updateValue, 100);
@@ -17,9 +21,25 @@
   // Track last reset document to ensure reset runs only once per actor/document
   let lastResetDocName = null;
 
+  const settingValue = safeGetSetting(
+    MODULE_ID,
+    "standardArray",
+    "15, 14, 13, 12, 10, 8",
+  );
+  const settingArray = settingValue
+    .split(",")
+    .map((v) => parseInt(v.trim()))
+    .filter((v) => !isNaN(v));
+  const abilityKeys = ["str", "dex", "con", "int", "wis", "cha"];
+
+  const customStandardArray = abilityKeys.reduce((acc, key, index) => {
+    acc[key] = settingArray[index] ?? 10;
+    return acc;
+  }, {});
+
   async function updateValue(attr, value) {
     // move the value to the next ability according to the direction of the arrow
-    const abilities = Object.keys(STANDARD_ARRAY);
+    const abilities = Object.keys(customStandardArray);
     // get index of attr from abilities
     const index = abilities.indexOf(attr);
     switch (value) {
@@ -66,9 +86,9 @@
   //- sets the values to the standard array
   async function reset() {
     $abilityRolls = {}; //- reset any existin rolls if that option is enabled
-    Object.keys(STANDARD_ARRAY).forEach((key) => {
+    Object.keys(customStandardArray).forEach((key) => {
       options.system.abilities[key] = {
-        value: STANDARD_ARRAY[key],
+        value: customStandardArray[key],
       };
     });
 
@@ -109,23 +129,27 @@
 
   // Compute if current abilities match the standard array (order-insensitive)
   $: isStandardArrayCurrent = arraysMatch(
-    Object.values(STANDARD_ARRAY),
-    Object.keys(STANDARD_ARRAY).map((key) => $doc.system.abilities[key]?.value),
+    Object.values(customStandardArray),
+    Object.keys(customStandardArray).map(
+      (key) => $doc.system.abilities[key]?.value,
+    ),
   );
-
 
   // Update the isStandardArrayValues store for progress tracking
   $: isStandardArrayValues.set(isStandardArrayCurrent);
-
 
   $: if (
     $doc?.system?.abilities &&
     $doc?.name &&
     lastResetDocName !== $doc.name &&
-    Object.keys(STANDARD_ARRAY).every(key => $doc.system.abilities[key]?.value === 10) &&
+    Object.keys(customStandardArray).every(
+      (key) => $doc.system.abilities[key]?.value === 10,
+    ) &&
     !arraysMatch(
-      Object.keys(STANDARD_ARRAY).map(key => $doc.system.abilities[key]?.value),
-      Object.values(STANDARD_ARRAY)
+      Object.keys(customStandardArray).map(
+        (key) => $doc.system.abilities[key]?.value,
+      ),
+      Object.values(customStandardArray),
     )
   ) {
     // window.GAS.log.d('StandardArray: Triggering reset for doc name:', $doc.name);
