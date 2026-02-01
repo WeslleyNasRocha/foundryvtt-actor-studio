@@ -42,6 +42,7 @@ export function registerSettings(app: Game): void {
   defaultStartingGoldDice();
   allowManualInput();
   allowStandardArray();
+  standardArray();
   allowPointBuy();
   pointBuyLimit();
   allowRolling(app);
@@ -478,6 +479,17 @@ function allowStandardArray() {
     config: true,
     default: false,
     type: Boolean,
+  });
+}
+
+function standardArray() {
+  game.settings.register(MODULE_ID, 'standardArray', {
+    name: game.i18n.localize('GAS.Setting.AbilityEntry.StandardArray.Name'),
+    hint: game.i18n.localize('GAS.Setting.AbilityEntry.StandardArray.Hint'),
+    scope: 'world',
+    config: true,
+    default: '15, 14, 13, 12, 10, 8',
+    type: String,
   });
 }
 

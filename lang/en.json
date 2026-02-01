@@ -140,6 +140,10 @@
           "Name": "Allow standard array",
           "Hint": "Allow the user to use the standard array"
         },
+        "StandardArray": {
+          "Name": "Custom standard array",
+          "Hint": "Set the custom standard array values (comma separated, e.g. 15, 14, 13, 12, 10, 8)"
+        },
         "AllowPointBuy": {
           "Name": "Allow point buy",
           "Hint": "Allow the user to use the point buy system",
@@ -449,7 +453,7 @@
       "Skip": "Skip",
       "Retry": "Retry",
       "SelectedSpells": "Selected Spells",
-      "AvailableSpells":"Available Spells",
+      "AvailableSpells": "Available Spells",
       "NoSpellsSelected": "No spells selected"
     },
     "FeatSelector": {
@@ -463,7 +467,7 @@
     },
     "SpellSchool": {
       "abj": "Abjuration",
-      "con": "Conjuration", 
+      "con": "Conjuration",
       "div": "Divination",
       "enc": "Enchantment",
       "evo": "Evocation",
